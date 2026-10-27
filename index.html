@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LKPD Gerak Lurus: GLB dan GLBB</title>
+<style>
+:root{--bg:#f6f3ea;--card:#fff;--ink:#222;--mut:#666;--ac:#1d5c8a;--ac2:#b5472a;--line:#d9d2bf}
+@media (prefers-color-scheme:dark){:root{--bg:#171a1e;--card:#22262b;--ink:#e8e8e8;--mut:#a0a6ad;--ac:#6db3e8;--ac2:#f0906f;--line:#3a4048}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:var(--ac);color:#fff;padding:20px 16px;text-align:center}
+header h1{margin:0;font-size:1.5rem}header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
+main{max-width:860px;margin:0 auto;padding:16px}
+.id{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:14px}
+.id label{font-size:.8rem;color:var(--mut)}.id input{width:100%;padding:7px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;cursor:pointer;font-weight:600}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+section.act{display:none}section.act.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+h2{margin:0 0 8px;font-size:1.2rem;color:var(--ac)}h3{margin:14px 0 6px;font-size:1rem}
+.box{border-left:4px solid var(--ac2);background:rgba(181,71,42,.08);padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0}
+.box.info{border-left-color:var(--ac);background:rgba(29,92,138,.08)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:6px 0;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px;text-align:center;white-space:nowrap}th{background:rgba(29,92,138,.12)}
+td input,td select{width:100%;min-width:70px;padding:5px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--ink)}
+td.tl{text-align:left;font-weight:600}
+textarea{width:100%;min-height:70px;padding:8px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink);font:inherit}
+svg{color:var(--ink)}
+.fcard{border:1px dashed var(--ac);border-radius:8px;padding:8px;margin:6px 0;text-align:left}.fcard img{max-width:100%;max-height:260px;display:block;margin:6px 0;border-radius:6px}a.btn{text-decoration:none;display:inline-block}
+canvas{width:100%;max-width:600px;display:block;margin:8px auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:6px 0}
+.ctl label{font-size:.85rem}.ctl select,.ctl input[type=range]{padding:4px}
+.res{text-align:center;font-weight:600;color:var(--ac2);min-height:1.5em}
+.btn{padding:10px 16px;border:0;border-radius:8px;background:var(--ac2);color:#fff;font-weight:600;cursor:pointer}
+.q{margin:10px 0}.q b{display:block;margin-bottom:4px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.g2 canvas{max-width:none;margin:4px 0}.g2 .gt{font-weight:700;font-size:.9rem;text-align:center}
+.pred{border:1px dashed var(--ac2);border-radius:8px;padding:8px 10px;margin:8px 0}
+.pb{margin:8px 0}.st{margin:10px 0;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(29,92,138,.06)}
+.st>.tag{display:block;font-weight:700;color:var(--ac);margin-bottom:4px}.dk{margin:0;padding-left:20px}
+.eq{display:grid;grid-template-columns:max-content 1.4em 1fr;gap:4px 6px;align-items:center;margin:4px 0;overflow-x:auto}
+.eq .l{text-align:right;font-style:italic}.eq .o{text-align:center}.eq .fin{font-weight:700;color:var(--ac2)}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.25;margin:0 2px}.fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px}
+.nt{margin-top:6px;font-size:.95rem}
+textarea{resize:vertical;overflow:hidden;font-size:16px;line-height:1.5}
+.tw{position:relative}.tw textarea{resize:none;display:block;padding-bottom:36px}
+.rh{position:absolute;right:6px;bottom:6px;width:32px;height:32px;border-radius:8px;background:var(--ac2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 1px 5px rgba(0,0,0,.45)}
+.tfrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0}.ptxt{display:none}
+.ax{stroke:currentColor;stroke-width:1.5;fill:none}.sv{font-size:11px;fill:currentColor}
+@media print{
+.tabs,.btn,.ctl{display:none}section.act{display:block!important}body{background:#fff;color:#000}
+.rh{display:none}
+:root{--bg:#fff;--card:#fff;--ink:#000;--mut:#444;--line:#999;--ac:#1d5c8a;--ac2:#b5472a}
+textarea{display:none}.ptxt{display:block;border:1px solid #999;border-radius:6px;padding:6px;white-space:pre-wrap;min-height:2.2em;margin-bottom:6px}
+.tfrow .btn,input[type=file]{display:none}.fcard{break-inside:avoid;border:1px solid #999}.fcard img{max-height:none}
+body.one section.act:not(.on){display:none!important}
+header{background:#1d5c8a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}tr,figure,.st,.g2{break-inside:avoid}}
+</style>
+<noscript><style>section.act{display:block!important}.tabs{display:none}</style></noscript>
+</head>
+<body>
+<header>
+<h1>LKPD Gerak Lurus: GLB dan GLBB</h1>
+<p>Kinematika · Fisika SMA Fase E · Disusun oleh AAN SUCIARAHMAT, M.Pd / SMAN 1 Majalengka</p>
+</header>
+<main>
+<noscript><div class="box" style="margin:10px 0"><b>Peringatan:</b> JavaScript tidak aktif atau diblokir oleh aplikasi pembuka file. Simulasi, tombol, dan fitur PDF tidak akan berfungsi. Buka file ini di Chrome (Android) atau akses lewat tautan web (iPhone), bukan lewat pratinjau file.</div></noscript>
+<div class="id">
+<div><label>Nama</label><input id="nama"></div><div><label>Kelas / Kelompok</label><input id="kelas"></div>
+</div>
+<div class="card">
+<b>Tujuan pembelajaran</b>
+<ol style="margin:6px 0 0;padding-left:20px">
+<li>Menyelidiki hubungan posisi, kecepatan, dan waktu pada GLB serta menafsirkan grafik s–t dan v–t.</li>
+<li>Menyelidiki makna percepatan dan pengaruhnya terhadap kecepatan dan jarak pada GLBB dipercepat maupun diperlambat.</li>
+<li>Membedakan GLB dan GLBB dari data dan grafik, lalu menerapkannya untuk menyelesaikan masalah.</li>
+</ol>
+<div class="box info" style="margin-top:10px"><b>Petunjuk:</b> Kerjakan berurutan. <b>Tulis prediksimu lebih dulu</b> sebelum menjalankan simulasi. Prediksi yang meleset itu wajar, justru dari situ konsepnya kamu temukan. Tidak ada rumus yang perlu dihafal di awal: kamu akan menemukan sendiri dari data.</div>
+</div>
+<div class="tabs">
+<button class="on" data-t="a1">Aktivitas 1: GLB</button>
+<button data-t="a2">Aktivitas 2: GLBB</button>
+<button data-t="a3">Aktivitas 3: Sintesis &amp; Latihan</button>
+</div>
+
+<!-- AKTIVITAS 1 -->
+<section class="act on" id="a1">
+<div class="card">
+<h2>Aktivitas 1: Gerak Lurus Beraturan (GLB)</h2>
+<p>Bayangkan sebuah mobil mainan melaju di lintasan lurus. Pada GLB, kecepatannya <b>tidak berubah</b> sepanjang gerak.</p>
+
+<h3>A. Prediksi (isi sebelum simulasi)</h3>
+<div class="pred">Mobil mulai dari titik 0 dan bergerak lurus dengan kecepatan tetap <b>3 m/s</b>.</div>
+<div class="q"><b>1. Prediksikan posisi mobil setelah 1 s, 2 s, dan 3 s. Jelaskan alasanmu.</b><textarea placeholder="Tuliskan prediksimu..."></textarea></div>
+<div class="q"><b>2. Menurutmu, seperti apa bentuk grafik v–t dan grafik s–t mobil ini (datar, miring lurus, atau melengkung)? Mengapa?</b><textarea></textarea></div>
+
+<h3>B. Eksplorasi simulasi</h3>
+<p>Atur <b>v₀ = 3 m/s</b> dan durasi 6 s. Tekan <b>⏭ +1 detik</b> berulang kali untuk melihat gerak per detik (atau <b>▶ Mainkan</b> untuk gerak terus-menerus). Panah <b style="color:var(--ac)">biru</b> menunjukkan kecepatan v, tanda di lintasan menunjukkan posisi tiap 1 detik.</p>
+<div class="sim" data-p="g" data-kind="glb"></div>
+
+<h3>C. Tabel pengamatan (v₀ = 3 m/s)</h3>
+<table><tr><th>t (s)</th><th>Posisi s (m)</th><th>Δs dalam 1 detik terakhir (m)</th><th>Kecepatan v (m/s)</th></tr>
+<tr><td>1</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>2</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>3</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>4</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>5</td><td><input></td><td><input></td><td><input></td></tr></table>
+<p style="font-size:.85rem;color:var(--mut)">Δs = posisi sekarang dikurangi posisi 1 detik sebelumnya.</p>
+
+<div class="q"><b>3. Bandingkan prediksimu (soal 1 dan 2) dengan hasil simulasi. Bagian mana yang sudah tepat dan bagian mana yang perlu kamu perbaiki?</b><textarea></textarea></div>
+<div class="q"><b>4. Perhatikan kolom Δs. Apa yang kamu temukan? Apa artinya bagi gerak mobil?</b><textarea></textarea></div>
+<div class="q"><b>5. Grafik v–t berbentuk apa? Jelaskan mengapa bentuknya demikian, kaitkan dengan percepatan mobil.</b><textarea></textarea></div>
+<div class="q"><b>6. Grafik s–t berbentuk apa? Hitung kemiringan (Δs ÷ Δt) garis itu, lalu bandingkan dengan nilai v. Apa yang sebenarnya ditunjukkan oleh kemiringan grafik s–t?</b><textarea></textarea></div>
+
+<h3>D. Mengubah kecepatan</h3>
+<p>Atur durasi minimal 4 s. Ubah v₀ sesuai tabel, lalu jalankan sampai t = 4 s.</p>
+<table><tr><th>v₀ (m/s)</th><th>s saat t = 4 s (m)</th><th>Kemiringan garis s–t (m/s)</th><th>Luas daerah di bawah grafik v–t, 0 sampai 4 s</th></tr>
+<tr><td>2</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>5</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>8</td><td><input></td><td><input></td><td><input></td></tr></table>
+<div class="q"><b>7. Bandingkan kolom "s saat t = 4 s" dengan kolom "luas daerah di bawah grafik v–t". Apa hubungannya? Mengapa hal itu bisa terjadi? (Petunjuk: luas = alas × tinggi = t × v)</b><textarea></textarea></div>
+<div class="q"><b>8. Jika kecepatan dijadikan dua kali lebih besar, apa yang berubah pada grafik s–t dan pada posisi di waktu yang sama?</b><textarea></textarea></div>
+<div class="q"><b>9. Andi berkata: "Kalau kecepatannya tetap, berarti tidak ada yang berubah pada mobil itu." Setujukah kamu? Jelaskan apa yang tetap dan apa yang berubah pada GLB.</b><textarea></textarea></div>
+<div class="q"><b>10. Kesimpulan Aktivitas 1 (dengan kata-katamu sendiri: apa ciri GLB pada data, pada grafik v–t, dan pada grafik s–t?)</b><textarea></textarea></div>
+</div>
+<div style="text-align:center;margin:8px 0 16px"><button class="btn" onclick="cetakAktivitas('a1')">📄 Simpan Aktivitas 1 (GLB) sebagai PDF</button></div>
+</section>
+
+<!-- AKTIVITAS 2 -->
+<section class="act" id="a2">
+<div class="card">
+<h2>Aktivitas 2: Gerak Lurus Berubah Beraturan (GLBB)</h2>
+<p>Pada GLBB, kecepatan benda <b>berubah dengan besar yang sama setiap detik</b>. Besar perubahan kecepatan tiap satuan waktu itu disebut <b>percepatan (a)</b>. Panah <b style="color:var(--ac2)">oranye</b> pada simulasi menunjukkan percepatan.</p>
+
+<h3>A. Prediksi (isi sebelum simulasi)</h3>
+<div class="pred">Mobil mulai dari <b>diam</b>, lalu kecepatannya bertambah secara teratur <b>2 m/s setiap detik</b> (a = 2 m/s²).</div>
+<div class="q"><b>1. Prediksikan kecepatan mobil pada t = 1 s, 2 s, dan 3 s.</b><textarea placeholder="Tuliskan prediksimu..."></textarea></div>
+<div class="q"><b>2. Apakah jarak yang ditempuh tiap detik akan sama seperti pada GLB? Prediksikan dan jelaskan alasanmu.</b><textarea></textarea></div>
+
+<h3>B. Eksplorasi: GLBB dipercepat</h3>
+<p>Pilih <b>Dipercepat</b>, v₀ = 0, a = 2 m/s², durasi 6 s. Gunakan <b>⏭ +1 detik</b> dan catat data tiap detik.</p>
+<div class="sim" data-p="b" data-kind="glbb"></div>
+
+<h3>C. Tabel pengamatan: dipercepat (v₀ = 0, a = 2 m/s²)</h3>
+<table><tr><th>t (s)</th><th>v (m/s)</th><th>Posisi s (m)</th><th>Δs dalam 1 detik terakhir (m)</th></tr>
+<tr><td>1</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>2</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>3</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>4</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>5</td><td><input></td><td><input></td><td><input></td></tr></table>
+
+<div class="q"><b>3. Bandingkan prediksimu dengan data simulasi. Apa yang sudah tepat, apa yang perlu diperbaiki?</b><textarea></textarea></div>
+<div class="q"><b>4. Kolom v bertambah berapa tiap detik? Angka itu sama dengan besaran apa yang kamu atur di simulasi? Apa artinya a = 2 m/s² dengan kata-katamu sendiri?</b><textarea></textarea></div>
+<div class="q"><b>5. Perhatikan kolom Δs. Apakah nilainya tetap? Berapa selisih antara Δs yang berurutan, dan sama dengan besaran apa? Mengapa jarak tiap detik makin besar padahal selang waktunya sama?</b><textarea></textarea></div>
+<div class="q"><b>6. Bagaimana bentuk grafik v–t dan s–t? Apa yang ditunjukkan kemiringan grafik v–t? Mengapa grafik s–t melengkung dan tidak lurus seperti pada GLB?</b><textarea></textarea></div>
+<div class="q"><b>7. Hitung luas segitiga di bawah grafik v–t sampai t = 4 s (½ × alas × tinggi). Bandingkan dengan s pada t = 4 s di tabel. Apa kesimpulanmu?</b><textarea></textarea></div>
+<div class="q"><b>8. Rina berkata: "Percepatan 2 m/s² artinya kecepatan mobil 2 m/s." Menurutmu benar atau keliru? Gunakan data tabelmu untuk menjelaskan.</b><textarea></textarea></div>
+
+<h3>D. Eksplorasi: GLBB diperlambat</h3>
+<p>Pilih <b>Diperlambat</b>, v₀ = 8 m/s, a = 2 m/s². Panah percepatan kini menghadap <b>berlawanan</b> dengan arah gerak.</p>
+<table><tr><th>t (s)</th><th>v (m/s)</th><th>Posisi s (m)</th><th>Δs dalam 1 detik terakhir (m)</th></tr>
+<tr><td>1</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>2</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>3</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>4</td><td><input></td><td><input></td><td><input></td></tr></table>
+<div class="q"><b>9. Apa yang terjadi pada v dan pada Δs tiap detik? Pada t berapa mobil berhenti? Bagaimana waktu berhenti itu berkaitan dengan v₀ dan a?</b><textarea></textarea></div>
+<div class="q"><b>10. Berapa jarak total sampai mobil berhenti? Tunjukkan bahwa jarak itu sama dengan luas segitiga di bawah grafik v–t.</b><textarea></textarea></div>
+<div class="q"><b>11. Dalam perhitungan, percepatan mobil ini dituliskan a = −2 m/s². Apa makna tanda negatif itu? Apakah berarti mobilnya bergerak mundur? Jelaskan.</b><textarea></textarea></div>
+
+<h3>E. Menguji pengaruh v₀ dan a</h3>
+<p>Pilih <b>Dipercepat</b>, durasi minimal 4 s. Atur v₀ dan a sesuai tabel, jalankan sampai t = 4 s, lalu hitung kolom terakhir.</p>
+<table><tr><th>v₀ (m/s)</th><th>a (m/s²)</th><th>v saat t = 4 s (simulasi)</th><th>s saat t = 4 s (simulasi)</th><th>Hitung: v₀·t + ½·a·t²</th></tr>
+<tr><td>0</td><td>1</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>0</td><td>2</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>0</td><td>4</td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>4</td><td>2</td><td><input></td><td><input></td><td><input></td></tr></table>
+<div class="q"><b>12. Apakah hasil hitung cocok dengan simulasi? Jika a dijadikan dua kali (v₀ = 0), bagaimana v dan s berubah?</b><textarea></textarea></div>
+<div class="q"><b>13. Pada baris v₀ = 4 dan a = 2, jarak tempuhnya lebih besar daripada baris v₀ = 0 dan a = 2. Berapa selisihnya? Jelaskan dari mana suku "v₀·t" dan suku "½·a·t²" berasal (apa yang disumbangkan masing-masing pada jarak?).</b><textarea></textarea></div>
+<div class="q"><b>14. Kesimpulan Aktivitas 2 (apa ciri GLBB pada data, grafik v–t, dan grafik s–t? Apa bedanya GLBB dipercepat dan diperlambat?)</b><textarea></textarea></div>
+</div>
+<div style="text-align:center;margin:8px 0 16px"><button class="btn" onclick="cetakAktivitas('a2')">📄 Simpan Aktivitas 2 (GLBB) sebagai PDF</button></div>
+</section>
+
+<!-- AKTIVITAS 3 -->
+<section class="act" id="a3">
+<div class="card">
+<h2>Aktivitas 3: Sintesis dan Penerapan</h2>
+<h3>A. Membandingkan GLB dan GLBB</h3>
+<p>Lengkapi tabel berikut berdasarkan temuanmu di Aktivitas 1 dan 2.</p>
+<table><tr><th>Aspek</th><th>GLB</th><th>GLBB</th></tr>
+<tr><td class="tl">Kecepatan</td><td><input></td><td><input></td></tr>
+<tr><td class="tl">Percepatan</td><td><input></td><td><input></td></tr>
+<tr><td class="tl">Jarak tiap selang waktu sama</td><td><input></td><td><input></td></tr>
+<tr><td class="tl">Bentuk grafik v–t</td><td><input></td><td><input></td></tr>
+<tr><td class="tl">Bentuk grafik s–t</td><td><input></td><td><input></td></tr>
+<tr><td class="tl">Menentukan jarak dari grafik v–t</td><td><input></td><td><input></td></tr></table>
+
+<h3>B. Tantangan konsep</h3>
+<p>Dua mobil, A dan B, berangkat bersamaan dari titik yang sama. Mobil A bergerak GLB dengan kecepatan 6 m/s. Mobil B bergerak GLBB dari keadaan diam dengan percepatan 1,5 m/s². Grafik v–t keduanya:</p>
+<figure style="margin:6px 0;text-align:center"><svg viewBox="0 0 300 200" style="width:100%;max-width:340px" role="img" aria-label="Grafik v-t mobil A dan mobil B">
+<path class="ax" d="M40 170 H288 M40 170 V16"/>
+<path d="M40 98 H280" stroke="#b5472a" stroke-width="3" fill="none"/>
+<path d="M40 170 L280 26" stroke="#1d5c8a" stroke-width="3" fill="none"/>
+<g class="ax"><path d="M100 170v5M160 170v5M220 170v5M280 170v5M40 98h-5M40 26h-5"/></g>
+<text class="sv" x="38" y="187">0</text><text class="sv" x="97" y="187">2</text><text class="sv" x="157" y="187">4</text><text class="sv" x="217" y="187">6</text><text class="sv" x="277" y="187">8</text>
+<text class="sv" x="22" y="102">6</text><text class="sv" x="16" y="30">12</text>
+<text class="sv" x="250" y="196">t (s)</text><text class="sv" x="4" y="12">v (m/s)</text>
+<text x="262" y="90" font-size="13" font-weight="700" fill="#b5472a">A</text><text x="236" y="58" font-size="13" font-weight="700" fill="#1d5c8a">B</text>
+</svg></figure>
+<div class="q"><b>1. Pada t = 4 s, kedua mobil memiliki kecepatan yang sama. Apakah posisinya juga sama? Hitung posisi masing-masing (gunakan luas di bawah grafik) dan jelaskan.</b><textarea></textarea></div>
+<div class="q"><b>2. Kapan kedua mobil berada pada posisi yang sama lagi? Jelaskan alasanmu menggunakan luas di bawah grafik.</b><textarea></textarea></div>
+<div class="q"><b>3. Kamu diberi tabel data waktu dan posisi sebuah benda yang bergerak lurus. Bagaimana caramu menentukan apakah gerak itu GLB atau GLBB tanpa menggambar grafik?</b><textarea></textarea></div>
+<div class="q"><b>4. Kesimpulan akhir: tulis tiga konsep terpenting yang kamu pahami dari LKPD ini.</b><textarea></textarea></div>
+
+<hr style="border:0;border-top:1px solid var(--line);margin:18px 0 6px">
+<h3>C. Contoh Soal dan Pembahasan</h3>
+<div class="box"><b>Soal:</b> Sebuah mobil melaju lurus dengan kecepatan tetap 20 m/s selama 3 s. Pengemudi kemudian mengerem sehingga mobil melambat beraturan dan berhenti setelah 5 s. Tentukan (a) jarak yang ditempuh saat kecepatan tetap, (b) percepatan mobil saat pengereman, (c) jarak yang ditempuh selama pengereman, dan (d) jarak total. Gambarkan grafik v–t dan tunjukkan jarak total sebagai luas.</div>
+<div class="pb"><b>Pembahasan:</b>
+<div class="st"><span class="tag">Diketahui</span><ul class="dk"><li>Tahap 1 (GLB): v = 20 m/s, t₁ = 3 s</li><li>Tahap 2 (GLBB diperlambat): v₀ = 20 m/s, v akhir = 0, t₂ = 5 s</li></ul></div>
+<div class="st"><span class="tag">(a) Jarak saat kecepatan tetap (GLB)</span>
+<div class="eq"><span class="l">s₁</span><span class="o">=</span><span class="r">v · t₁</span><span class="l"></span><span class="o">=</span><span class="r">20 × 3</span><span class="l"></span><span class="o">=</span><span class="r fin">60 m</span></div></div>
+<div class="st"><span class="tag">(b) Percepatan saat pengereman</span>
+<div class="eq"><span class="l">a</span><span class="o">=</span><span class="r"><span class="fr"><span>v − v₀</span><span>t₂</span></span></span><span class="l"></span><span class="o">=</span><span class="r"><span class="fr"><span>0 − 20</span><span>5</span></span></span><span class="l"></span><span class="o">=</span><span class="r fin">−4 m/s²</span></div>
+<div class="nt">Tanda negatif berarti arah percepatan <b>berlawanan</b> dengan arah gerak sehingga mobil melambat (mobil tidak bergerak mundur).</div></div>
+<div class="st"><span class="tag">(c) Jarak selama pengereman</span>
+<div class="eq"><span class="l">s₂</span><span class="o">=</span><span class="r">v₀ · t₂ + ½ · a · t₂²</span><span class="l"></span><span class="o">=</span><span class="r">20 × 5 + ½ × (−4) × 5²</span><span class="l"></span><span class="o">=</span><span class="r">100 − 50</span><span class="l"></span><span class="o">=</span><span class="r fin">50 m</span></div>
+<div class="nt">Pemeriksaan dengan luas segitiga di bawah grafik: ½ × 20 × 5 = 50 m ✔</div></div>
+<div class="st"><span class="tag">(d) Jarak total dan grafik v–t</span>
+<div class="eq"><span class="l">s</span><span class="o">=</span><span class="r">s₁ + s₂</span><span class="l"></span><span class="o">=</span><span class="r">60 + 50</span><span class="l"></span><span class="o">=</span><span class="r fin">110 m</span></div>
+<figure style="margin:8px 0;text-align:center"><svg viewBox="0 0 300 200" style="width:100%;max-width:340px" role="img" aria-label="Grafik v-t contoh soal">
+<path class="ax" d="M40 170 H288 M40 170 V16"/>
+<path d="M40 30 H130 V170 H40Z" fill="#1d5c8a" fill-opacity=".22"/>
+<path d="M130 30 L280 170 H130Z" fill="#b5472a" fill-opacity=".22"/>
+<path d="M40 30 H130 L280 170" stroke="currentColor" stroke-width="3" fill="none"/>
+<path d="M130 30 V170" stroke="currentColor" stroke-dasharray="4 3" fill="none"/>
+<g class="ax"><path d="M130 170v5M280 170v5M40 30h-5"/></g>
+<text class="sv" x="38" y="187">0</text><text class="sv" x="127" y="187">3</text><text class="sv" x="277" y="187">8</text><text class="sv" x="16" y="34">20</text>
+<text class="sv" x="250" y="196">t (s)</text><text class="sv" x="4" y="12">v (m/s)</text>
+<text x="66" y="106" font-size="13" font-weight="700" fill="currentColor">60 m</text><text x="170" y="146" font-size="13" font-weight="700" fill="currentColor">50 m</text>
+</svg><figcaption style="font-size:.85rem">Luas persegi panjang (GLB) + luas segitiga (pengereman) = jarak total</figcaption></figure></div>
+</div>
+
+<h3>Latihan 1: Benar atau Salah</h3>
+<p><b>Pernyataan:</b> Mobil yang baru mulai bergerak dari keadaan diam memiliki percepatan nol, karena pada saat itu kecepatannya nol.</p>
+<div class="tfrow"><label><input type="radio" name="tf1" value="B"> Benar</label><label><input type="radio" name="tf1" value="S"> Salah</label><button class="btn" onclick="cekTF(1)">Periksa</button></div>
+<div class="res" id="tfr1" style="text-align:left"></div>
+<div class="q"><b>Alasanmu (opsional)</b><textarea id="tfa1" placeholder="Jelaskan mengapa kamu memilih jawaban itu..."></textarea></div>
+
+<h3>Latihan 2: Uraian Singkat</h3>
+<p>Sebuah sepeda motor bergerak lurus dengan kecepatan 4 m/s, lalu dipercepat beraturan 2 m/s² selama 6 s. (a) Hitung kecepatan motor di akhir 6 s. (b) Hitung jarak yang ditempuh selama 6 s menggunakan rumus. (c) Gambarkan grafik v–t, hitung luas daerah di bawahnya (bentuk trapesium), lalu bandingkan dengan hasil (b). Tuliskan langkah penyelesaianmu secara lengkap.</p>
+<div class="q"><b>Catatan jawaban (opsional)</b><textarea id="un1" placeholder="Tuliskan ringkasan jawabanmu..."></textarea></div>
+<div class="q"><b>Unggah foto/scan pembahasanmu (gambar JPG/PNG, boleh lebih dari satu, maks. 3 MB per foto; ikut tercetak di PDF)</b><input type="file" id="uf1" accept="image/*" multiple onchange="upl(1,this)"><div id="ui1"></div></div>
+</div>
+<div style="text-align:center;margin:8px 0 16px"><button class="btn" onclick="cetakAktivitas('a3')">📄 Simpan Aktivitas 3 (Sintesis &amp; Latihan) sebagai PDF</button></div>
+</section>
+
+<div class="card"><h2>Kumpulkan ke Guru</h2><p>Setelah semua terisi, klik <b>Simpan sebagai PDF</b> di bawah. Pada jendela cetak, pilih tujuan <b>Simpan sebagai PDF</b> (di HP: Bagikan/Cetak → Simpan PDF). Seluruh isian, jawaban Benar/Salah, catatan, dan foto jawaban uraian ikut masuk ke PDF. Kirim <b>satu file PDF</b> itu ke gurumu. Kamu juga bisa menyimpan PDF per aktivitas lewat tombol di akhir tiap aktivitas; ikuti petunjuk gurumu mana yang dikumpulkan.</p></div>
+<div style="text-align:center;margin:16px 0"><button class="btn" onclick="cetak()">Simpan sebagai PDF</button></div>
+<p id="autoNote" style="text-align:center;font-size:.85rem;color:var(--mut);margin:0 0 6px">💾 Jawabanmu tersimpan otomatis di browser perangkat ini, jadi aman jika halaman di-refresh. Gunakan HP/browser yang sama saat melanjutkan.</p>
+<div style="text-align:center;margin:0 0 20px"><button class="btn" style="background:var(--ac)" onclick="hapusSemua()">🗑 Hapus semua jawaban</button></div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let PRINT=false;
+const SIMS=[];
+const fm=(x,d=1)=>(Math.abs(x)<1e-9?0:x).toFixed(d).replace('.',',');
+const col=()=>{
+  if(PRINT)return{ink:'#000',ac:'#1d5c8a',ac2:'#b5472a',ln:'#999'};
+  const s=getComputedStyle(document.documentElement);
+  return{ink:s.getPropertyValue('--ink').trim(),ac:s.getPropertyValue('--ac').trim(),ac2:s.getPropertyValue('--ac2').trim(),ln:s.getPropertyValue('--line').trim()};
+};
+function nice(r){const e=Math.pow(10,Math.floor(Math.log10(r)));const f=r/e;return(f<=1?1:f<=2?2:f<=5?5:10)*e}
+function arrow(c,x1,y1,x2,y2,color,w=3){
+  const a=Math.atan2(y2-y1,x2-x1);c.strokeStyle=color;c.fillStyle=color;c.lineWidth=w;
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-11*Math.cos(a-.4),y2-11*Math.sin(a-.4));c.lineTo(x2-11*Math.cos(a+.4),y2-11*Math.sin(a+.4));c.fill();
+}
+
+/* ===== Tab ===== */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section.act').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$(b.dataset.t).classList.add('on');SIMS.forEach(s=>s.draw());
+});
+
+/* ===== Simulasi mini (mengikuti Lab Maya Gerak Lurus) ===== */
+function simHTML(p,kind){
+  const glbb=kind==='glbb';
+  return '<canvas id="'+p+'Trk" width="600" height="180" role="img" aria-label="Lintasan mobil"></canvas>'
+  +'<div class="ctl">'
+  +(glbb?'<label>Jenis gerak <select id="'+p+'mode"><option value="acc">Dipercepat</option><option value="dec">Diperlambat</option></select></label>':'')
+  +'<label>v₀: <span id="'+p+'v0v"></span> m/s <input type="range" id="'+p+'v0" min="'+(glbb?0:0.5)+'" max="10" step="0.5" value="'+(glbb?0:3)+'"></label>'
+  +(glbb?'<label>a: <span id="'+p+'av"></span> m/s² <input type="range" id="'+p+'a" min="0.5" max="4" step="0.5" value="2"></label>':'')
+  +'<label>Durasi: <span id="'+p+'dv"></span> s <input type="range" id="'+p+'dur" min="3" max="10" step="1" value="6"></label>'
+  +'</div>'
+  +'<div class="ctl"><button class="btn" id="'+p+'play">▶ Mainkan</button><button class="btn" id="'+p+'step" style="background:var(--ac)">⏭ +1 detik</button><button class="btn" id="'+p+'reset" style="background:var(--mut)">↺ Ulangi</button></div>'
+  +'<div class="res" id="'+p+'out"></div>'
+  +'<div class="g2"><div><div class="gt">Grafik v–t</div><canvas id="'+p+'Vt" width="400" height="260"></canvas></div><div><div class="gt">Grafik s–t</div><canvas id="'+p+'St" width="400" height="260"></canvas></div></div>';
+}
+function mk(p,kind){
+  const E=id=>$(p+id);
+  const S={t:0,goal:0,run:false,last:0,rate:1};
+  const prm=()=>{
+    const v0=+E('v0').value;let a=0,dec=false;
+    if(kind==='glbb'){a=+E('a').value;dec=E('mode').value==='dec'}
+    return{v0,a:dec?-a:a,dec,dur:+E('dur').value};
+  };
+  const Dof=q=>{let D=q.dur;if(q.a<0)D=Math.min(D,q.v0/-q.a);return Math.max(D,0.001)};
+  const sAt=(q,t)=>q.v0*t+.5*q.a*t*t, vAt=(q,t)=>q.v0+q.a*t;
+  function labels(){
+    E('v0v').textContent=fm(+E('v0').value);E('dv').textContent=E('dur').value;
+    if(kind==='glbb')E('av').textContent=fm(+E('a').value);
+  }
+  function graph(cv,f,D,t,top,color,ylab,area){
+    const c=cv.getContext('2d'),k=col(),W=cv.width,H=cv.height;c.clearRect(0,0,W,H);
+    const L=50,R=14,T=22,B=38,pw=W-L-R,ph=H-T-B;
+    const raw=Math.max(top,1)*1.1,step=nice(raw/4),ymax=Math.ceil(raw/step-1e-9)*step;
+    const X=tt=>L+tt/D*pw,Y=v=>T+ph-v/ymax*ph;
+    c.font='13px system-ui,sans-serif';c.fillStyle=k.ink;c.lineWidth=1;
+    for(let i=0;i*step<=ymax+1e-9;i++){
+      const v=i*step,y=Y(v);c.strokeStyle=k.ln;c.beginPath();c.moveTo(L,y);c.lineTo(W-R,y);c.stroke();
+      c.textAlign='right';c.fillText(String(Math.round(v*100)/100).replace('.',','),L-6,y+4);
+    }
+    const xs=D<=6?1:2;c.textAlign='center';
+    for(let tt=0;tt<=D+1e-9;tt+=xs){c.strokeStyle=k.ln;c.beginPath();c.moveTo(X(tt),T);c.lineTo(X(tt),T+ph);c.stroke();c.fillText(String(Math.round(tt*10)/10).replace('.',','),X(tt),T+ph+16)}
+    c.strokeStyle=k.ink;c.lineWidth=2;c.beginPath();c.moveTo(L,T);c.lineTo(L,T+ph);c.lineTo(W-R,T+ph);c.stroke();
+    c.textAlign='left';c.fillText(ylab,L+4,T-7);c.textAlign='right';c.fillText('t (s)',W-R,H-6);
+    const N=80;
+    c.globalAlpha=.3;c.strokeStyle=color;c.lineWidth=3;c.beginPath();
+    for(let i=0;i<=N;i++){const tt=D*i/N;i?c.lineTo(X(tt),Y(f(tt))):c.moveTo(X(tt),Y(f(tt)))}c.stroke();c.globalAlpha=1;
+    if(t>0){
+      if(area){c.globalAlpha=.2;c.fillStyle=color;c.beginPath();c.moveTo(X(0),Y(0));
+        for(let i=0;i<=N;i++){const tt=t*i/N;c.lineTo(X(tt),Y(f(tt)))}c.lineTo(X(t),Y(0));c.closePath();c.fill();c.globalAlpha=1}
+      c.strokeStyle=color;c.lineWidth=3.5;c.beginPath();
+      for(let i=0;i<=N;i++){const tt=t*i/N;i?c.lineTo(X(tt),Y(f(tt))):c.moveTo(X(tt),Y(f(tt)))}c.stroke();
+    }
+    c.fillStyle=color;c.beginPath();c.arc(X(t),Y(f(t)),5.5,0,7);c.fill();
+  }
+  function draw(){
+    labels();
+    const q=prm(),D=Dof(q),t=Math.min(S.t,D),k=col();
+    const cv=E('Trk'),c=cv.getContext('2d'),W=cv.width;c.clearRect(0,0,W,cv.height);
+    const smax=Math.max(sAt(q,D),1),X0=44,X1=480,xo=s=>X0+s/smax*(X1-X0);
+    // penggaris
+    const step=nice(smax/5);c.font='13px system-ui,sans-serif';c.textAlign='center';
+    c.strokeStyle=k.ink;c.fillStyle=k.ink;c.lineWidth=1.5;
+    c.beginPath();c.moveTo(X0,148);c.lineTo(W-30,148);c.stroke();
+    for(let i=0;i*step<=smax+1e-9;i++){const x=xo(i*step);c.beginPath();c.moveTo(x,143);c.lineTo(x,153);c.stroke();c.fillText(String(Math.round(i*step*100)/100).replace('.',','),x,168)}
+    c.textAlign='right';c.fillText('s (m)',W-6,168);
+    // jalan
+    c.strokeStyle=k.ln;c.lineWidth=2;c.beginPath();c.moveTo(0,134);c.lineTo(W,134);c.stroke();
+    // tanda tiap detik
+    c.textAlign='center';
+    for(let i=1;i<=Math.floor(t+1e-9)&&i<=D+1e-9;i++){
+      const x=xo(sAt(q,i));c.strokeStyle=k.ac;c.globalAlpha=.55;c.setLineDash([4,4]);c.lineWidth=1.5;
+      c.beginPath();c.moveTo(x,30);c.lineTo(x,134);c.stroke();c.setLineDash([]);c.globalAlpha=1;
+      c.fillStyle=k.ac;c.fillText(i+' s',x,24);
+    }
+    // mobil
+    const s=sAt(q,t),v=vAt(q,t),x=xo(s);
+    c.fillStyle=k.ac;c.beginPath();c.roundRect?c.roundRect(x-26,106,52,22,4):c.rect(x-26,106,52,22);c.fill();
+    c.beginPath();c.rect(x-14,94,26,13);c.fill();
+    c.fillStyle=k.ink;[-15,15].forEach(dx=>{c.beginPath();c.arc(x+dx,129,6,0,7);c.fill()});
+    // panah v dan a
+    c.textAlign='right';c.font='bold 14px system-ui,sans-serif';
+    if(v>0.01){arrow(c,x,62,x+6+v*8,62,k.ac,4)}
+    c.fillStyle=k.ac;c.fillText('v',x-8,67);
+    c.fillStyle=k.ac2;
+    if(Math.abs(q.a)>0.01){const L=6+Math.abs(q.a)*12,d=q.a>0?1:-1;if(S.t<D-1e-9||true){arrow(c,x,84,x+d*L,84,k.ac2,4)}if(d>0)c.fillText('a',x-8,89);else{c.textAlign='left';c.fillText('a',x+8,89)}}
+    else{c.textAlign='left';c.fillText('a = 0',x+8,89)}
+    // grafik
+    const vmax=Math.max(q.v0,vAt(q,D));
+    graph(E('Vt'),tt=>vAt(q,tt),D,t,vmax,k.ac,'v (m/s)',true);
+    graph(E('St'),tt=>sAt(q,tt),D,t,sAt(q,D),k.ac2,'s (m)',false);
+    // keluaran
+    let o='t = '+fm(t)+' s  |  v = '+fm(v)+' m/s  |  s = '+fm(s)+' m';
+    if(q.dec&&q.v0<=0)o='Naikkan v₀ lebih dari 0 agar mobil dapat diperlambat.';
+    else if(t>=D-1e-9&&t>0)o+=q.dec&&D<q.dur-1e-9?'  ✔ mobil berhenti':'  ✔ selesai';
+    E('out').textContent=o;
+    E('play').textContent=S.run&&S.rate===1?'⏸ Jeda':'▶ Mainkan';
+  }
+  function frame(ts){
+    if(!S.run)return;
+    const dt=Math.min(.05,(ts-S.last)/1000);S.last=ts;
+    S.t=Math.min(S.goal,S.t+dt*S.rate);
+    if(S.t>=S.goal-1e-9){S.t=S.goal;S.run=false}
+    draw();if(S.run)requestAnimationFrame(frame);
+  }
+  function go(goal,rate){S.goal=goal;S.rate=rate;S.run=true;S.last=performance.now();requestAnimationFrame(frame)}
+  function reset(){S.run=false;S.t=0;S.goal=0;draw()}
+  E('play').onclick=()=>{
+    const D=Dof(prm());
+    if(S.run){S.run=false;draw();return}
+    if(S.t>=D-1e-9)S.t=0;
+    go(D,1);
+  };
+  E('step').onclick=()=>{
+    const D=Dof(prm());S.run=false;
+    if(S.t>=D-1e-9)return;
+    go(Math.min(D,Math.floor(S.t+1e-9)+1),3);
+  };
+  E('reset').onclick=reset;
+  ['v0','a','dur'].forEach(i=>{if(E(i))E(i).oninput=reset});
+  if(kind==='glbb')E('mode').onchange=()=>{
+    if(E('mode').value==='dec'){E('v0').value=8;E('a').value=2}else{E('v0').value=0;E('a').value=2}
+    reset();
+  };
+  SIMS.push({draw});reset();
+}
+document.querySelectorAll('.sim').forEach(d=>{const p=d.dataset.p;d.innerHTML=simHTML(p,d.dataset.kind);mk(p,d.dataset.kind)});
+matchMedia('(prefers-color-scheme:dark)').onchange=()=>SIMS.forEach(s=>s.draw());
+
+/* ===== Benar / Salah ===== */
+const TFK={1:'S'},TFE={1:'Salah. Percepatan adalah laju perubahan kecepatan (a = Δv ÷ Δt), bukan nilai kecepatan itu sendiri. Saat mobil mulai bergerak dari diam, kecepatannya memang nol, tetapi kecepatan itu sedang bertambah (misalnya 2 m/s tiap detik), sehingga percepatannya tidak nol.'};
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function cekTF(n){
+  const r=document.querySelector('input[name=tf'+n+']:checked'),o=$('tfr'+n);
+  if(!r){o.textContent='Pilih Benar atau Salah dulu.';return}
+  o.innerHTML=(r.value===TFK[n]?'✔ Tepat! ':'✘ Belum tepat. ')+esc(TFE[n]);
+}
+
+/* ===== Cetak PDF ===== */
+function prep(){
+  document.querySelectorAll('textarea').forEach(t=>{
+    let p=t.nextElementSibling;
+    if(!p||!p.classList.contains('ptxt')){p=document.createElement('div');p.className='ptxt';t.after(p)}
+    p.textContent=t.value;
+  });
+}
+function cetak(){document.body.classList.remove('one');prep();window.print()}
+function cetakAktivitas(id){
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t===id));
+  document.querySelectorAll('section.act').forEach(x=>x.classList.toggle('on',x.id===id));
+  document.body.classList.add('one');prep();window.print();
+}
+addEventListener('beforeprint',()=>{prep();PRINT=true;SIMS.forEach(s=>s.draw())});
+addEventListener('afterprint',()=>{document.body.classList.remove('one');PRINT=false;SIMS.forEach(s=>s.draw())});
+
+/* ===== Unggah foto ===== */
+const UP={1:[]};
+function showUp(n){
+  $('ui'+n).innerHTML=UP[n].map((f,i)=>'<div class="fcard">📎 <b>'+esc(f.name)+'</b> ('+Math.max(1,Math.round(f.size/1024))+' KB)<img src="'+f.data+'" alt="Foto jawaban"><div class="ctl" style="justify-content:flex-start"><a class="btn" href="'+f.data+'" download="'+esc(f.name)+'">⬇ Unduh gambar</a><button class="btn" style="background:var(--ac)" onclick="delUp('+n+','+i+')">Hapus</button></div></div>').join('');
+}
+function upl(n,inp){
+  Array.from(inp.files).forEach(f=>{
+    if(f.type.indexOf('image/')!==0){alert('Hanya file gambar (JPG/PNG) yang bisa diunggah agar ikut masuk ke PDF.');return}
+    if(f.size>3*1024*1024){alert(f.name+': ukuran maksimal 3 MB.');return}
+    const r=new FileReader();
+    r.onload=()=>{UP[n].push({name:f.name,size:f.size,data:r.result});showUp(n);saveUp()};
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function delUp(n,i){UP[n].splice(i,1);showUp(n);saveUp()}
+
+/* ===== Kotak teks: tinggi otomatis + pegangan tarik ===== */
+function grow(t){t.style.height='auto';t.style.height=Math.max(t.scrollHeight+2,70,t._min||0)+'px'}
+function growAll(){document.querySelectorAll('textarea').forEach(grow)}
+document.querySelectorAll('textarea').forEach(t=>{
+  const w=document.createElement('div');w.className='tw';t.parentNode.insertBefore(w,t);w.appendChild(t);
+  const h=document.createElement('div');h.className='rh';h.title='Tarik untuk memperbesar kotak';
+  h.innerHTML='<svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3L13 13M13 13H7M13 13V7M3 3H9M3 3V9"/></svg>';
+  w.appendChild(h);
+  h.addEventListener('pointerdown',e=>{
+    e.preventDefault();try{h.setPointerCapture(e.pointerId)}catch(x){}
+    const y0=e.clientY,h0=t.offsetHeight;
+    const mv=ev=>{const nh=Math.max(70,h0+ev.clientY-y0);t._min=nh;t.style.height=nh+'px'};
+    const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up)};
+    h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up);
+  });
+});
+document.querySelectorAll('textarea').forEach(t=>t.addEventListener('input',()=>grow(t)));
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(growAll,0)));
+addEventListener('resize',growAll);
+
+/* ===== PENYIMPANAN OTOMATIS (localStorage + IndexedDB untuk foto) =====
+   Naikkan VERSI_LKPD jika struktur LKPD berubah besar dan semua jawaban lama harus dikosongkan. */
+const VERSI_LKPD=1,LS_KEY='lkpd-glb-glbb:v'+VERSI_LKPD,IDB_NAME='lkpd-glb-glbb-foto-v'+VERSI_LKPD;
+const norm=t=>String(t||'').replace(/\s+/g,' ').trim();
+function fieldKey(el,seen){
+  let k;
+  if(el.id)k='#'+el.id;
+  else{
+    const sec=el.closest('section.act'),sid=sec?sec.id:'';
+    const q=el.closest('.q'),tr=el.closest('tr');
+    if(q){const b=q.querySelector('b');k=sid+'|q|'+norm(b&&b.textContent)}
+    else if(tr){
+      const tb=tr.closest('table'),hd=tb?norm(tb.rows[0].textContent):'';
+      k=sid+'|t|'+hd+'|'+Array.from(tr.cells).filter(c=>!c.querySelector('input')).map(c=>norm(c.textContent)).join(',');
+    }else k=sid+'|x';
+  }
+  seen[k]=(seen[k]||0)+1;
+  return seen[k]>1?k+'#'+seen[k]:k;
+}
+let FIELDS=[];
+function collectFields(){
+  const seen={};
+  FIELDS=Array.from(document.querySelectorAll('main textarea, main input:not([type=file]):not([type=range]):not([type=radio])')).filter(e=>!e.closest('.ctl')).map(e=>({el:e}));
+  FIELDS.forEach(f=>f.key=fieldKey(f.el,seen));
+}
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'null')||{f:{},r:{}}}catch(e){return{f:{},r:{}}}}
+let saveTimer=0;
+function saveNow(){
+  clearTimeout(saveTimer);
+  try{
+    const d={f:{},r:{}};
+    FIELDS.forEach(x=>{if(x.el.value!=='')d.f[x.key]=x.el.value});
+    document.querySelectorAll('input[type=radio]:checked').forEach(r=>{d.r[r.name]=r.value});
+    localStorage.setItem(LS_KEY,JSON.stringify(d));
+  }catch(e){}
+}
+function saveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,300)}
+function restoreAnswers(){
+  const d=lsGet();
+  FIELDS.forEach(x=>{if(d.f&&d.f[x.key]!=null)x.el.value=d.f[x.key]});
+  Object.keys(d.r||{}).forEach(n=>{
+    const r=document.querySelector('input[type=radio][name="'+n+'"][value="'+d.r[n]+'"]');if(r)r.checked=true;
+  });
+}
+function idb(){
+  return new Promise((ok,no)=>{
+    if(!window.indexedDB)return no();
+    const q=indexedDB.open(IDB_NAME,1);
+    q.onupgradeneeded=()=>q.result.createObjectStore('kv');
+    q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error);
+  });
+}
+function saveUp(){
+  idb().then(db=>{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(UP,'up');tx.oncomplete=()=>db.close()}).catch(()=>{});
+}
+function restoreUp(){
+  idb().then(db=>{
+    const g=db.transaction('kv').objectStore('kv').get('up');
+    g.onsuccess=()=>{const v=g.result;if(v){[1].forEach(n=>{UP[n]=Array.isArray(v[n])?v[n]:[];showUp(n)})}db.close()};
+  }).catch(()=>{});
+}
+function hapusSemua(){
+  if(!confirm('Hapus SEMUA jawaban dan foto yang tersimpan di perangkat ini? Tindakan ini tidak bisa dibatalkan.'))return;
+  try{localStorage.removeItem(LS_KEY)}catch(e){}
+  const done=()=>location.reload();
+  try{const r=indexedDB.deleteDatabase(IDB_NAME);r.onsuccess=r.onerror=r.onblocked=done}catch(e){done()}
+}
+collectFields();
+restoreAnswers();
+restoreUp();
+document.addEventListener('input',saveSoon);
+document.addEventListener('change',saveSoon);
+addEventListener('pagehide',saveNow);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveNow()});
+growAll();
+</script>
+</body>
+</html>
